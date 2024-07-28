@@ -55,7 +55,7 @@ def inizialize_board():
 
 @app.route("/")
 def index():
-    return open("index.html").read()
+    return open("../index.html").read()
 
 @app.route('/board')
 def returnboard():
