@@ -55,6 +55,11 @@ def inizialize_board():
 def index():
     return "test", 204
 
+@app.route("/version")
+def index():
+    version = 2.0
+    return version
+
 @app.route('/board')
 def returnboard():
     board , player = getboard()
