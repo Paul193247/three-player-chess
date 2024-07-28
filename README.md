@@ -10,7 +10,7 @@ base url: https://three-player-chess.vercel.app
   
 /board: returns the board e.g: {"A1":"R1", "A2":"N1", ..., }  
   
-/board (POST): moves a Figure expects list with following parameters:  
+/board (POST): moves a Figure, expects list with following parameters:  
 player: int, Number of the player making the move,  
 startpos: str, Position of the Figur being moved e.g: A1,  
 endpos: str, position wherw the Figur moves to e.g: A1  
