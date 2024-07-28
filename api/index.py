@@ -1,8 +1,6 @@
-#curl http://192.168.188.39:4242/board
-#curl http://192.168.188.39:4242/inizialize
-#curl -X POST -H "Content-Type: application/json" -d '{
-#  "player": 2, "a1": "QB", "a2": "QW"
-#}' http://192.168.188.39:4242/board
+#curl https://three-player-chess.vercel.app/board
+#curl https://three-player-chess.vercel.app/inizialize
+#curl -X POST -H "Content-Type: application/json" -d '{"player": 2, "startpos": "A2", "endpos": "A3"}' https://three-player-chess.vercel.app/board
 
 import json
 from flask import Flask, jsonify, request
@@ -55,7 +53,7 @@ def inizialize_board():
 
 @app.route("/")
 def index():
-    return "test", 204
+    return "Three Player Chess API Version: 2.0", 204
 
 @app.route('/board')
 def returnboard():
@@ -67,9 +65,11 @@ def change_board():
     changes = request.get_json()
 
     board, player = getboard()
-
-    board[changes["endpos"]] = board[changes["startpos"]]
-    board[changes["startpos"]] = ""
+    try:
+      board[changes["endpos"]] = board[changes["startpos"]]
+      board[changes["startpos"]] = ""
+    except Exception as e:
+        return f"Invalid move, Error: {e}", 400
 
     setboard(board)
 
