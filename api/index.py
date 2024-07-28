@@ -53,7 +53,7 @@ def inizialize_board():
 
 @app.route("/")
 def index():
-    return "Three Player Chess API Version: 2.0", 204
+    return "test", 204
 
 @app.route('/board')
 def returnboard():
