@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return open("../index.html").read()
+    return open("index.html").read()
 
 @app.route("/api")
 def api():
