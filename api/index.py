@@ -9,7 +9,6 @@ app = Flask(__name__)
 def home():
     return "Flask Vercel Example - Hello World", 200
 
-
-@app.errorhandler(404)
-def page_not_found(e):
-    return "Flask Vercel Example - Hello World", 404
+@app.route("/api")
+def api():
+    return "api"
