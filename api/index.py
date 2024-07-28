@@ -57,7 +57,7 @@ def index():
 
 @app.route("/version")
 def version():
-    version = "2.0.1"
+    version = "2.0.2"
     return jsonify(version)
 
 @app.route('/board')
@@ -67,18 +67,14 @@ def returnboard():
 
 @app.route('/board', methods=['POST'])
 def change_board():
-    #try:
     changes = request.get_json()
-
-     # board, player = getboard()
+    board, player = getboard()
       #board[changes["endpos"]] = board[changes["startpos"]]
       #board[changes["startpos"]] = ""
-    #except Exception as e:
-        #return f"Invalid move, Error: {e}", 400
 
     #setboard(board)
 
-    return '', 204
+    return changes, 204
 
 if __name__ == '__main__':
     app.run(debug=False)
