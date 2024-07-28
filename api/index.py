@@ -79,4 +79,4 @@ def change_board():
     return '', 204
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=4242, debug=True)
+    app.run(debug=False)
