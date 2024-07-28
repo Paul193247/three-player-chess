@@ -9,7 +9,6 @@ from flask import Flask, jsonify, request
 from vercel_kv import KV
 from dotenv import load_dotenv
 import logging
-import requests
 
 logging.basicConfig(level=logging.DEBUG)
 
