@@ -27,3 +27,8 @@ B: Bishop
 Q: Queen  
 K: King  
 P: Pawn  
+  
+## To Do  
+- /validmoves command, which returns all valid moves for a given piece  
+- validation, so that players can only execute commands if they are allowed to do so  
+- optional web GUI fot the API where you can create and play games
