@@ -53,11 +53,11 @@ def inizialize_board():
 
 @app.route("/")
 def index():
-    return "test", 204
+    return "Three Player Chess API"
 
 @app.route("/version")
 def version():
-    version = "2.0.2"
+    version = "2.0.3"
     return jsonify(version)
 
 @app.route('/board')
@@ -74,7 +74,7 @@ def change_board():
 
     #setboard(board)
 
-    return changes, 204
+    return changes
 
 if __name__ == '__main__':
     app.run(debug=False)
