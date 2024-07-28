@@ -84,7 +84,7 @@ def index():
 
 @app.route("/version")
 def version():
-    version = "2.0.4"
+    version = "2.1.0"
     return jsonify(version)
 
 @app.route('/board')
