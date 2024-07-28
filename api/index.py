@@ -1,3 +1,5 @@
+# /api/index.py
+
 from flask import Flask, jsonify
 
 app = Flask(__name__)
@@ -5,9 +7,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return "test 2"
-    #with open("index.html") as f:
-    #   return f.read()
+    return "Flask Vercel Example - Hello World", 200
 
 
 @app.errorhandler(404)
