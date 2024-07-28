@@ -57,7 +57,7 @@ def index():
 
 @app.route("/version")
 def version():
-    version = "2.0.3"
+    version = "2.0.4"
     return jsonify(version)
 
 @app.route('/board')
@@ -74,7 +74,7 @@ def change_board():
 
     #setboard(board)
 
-    return changes
+    return changes["startpos"]
 
 if __name__ == '__main__':
     app.run(debug=False)
