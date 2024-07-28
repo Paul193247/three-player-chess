@@ -56,7 +56,7 @@ def index():
     return "test", 204
 
 @app.route("/version")
-def index():
+def version():
     version = 2.0
     return jsonify(version)
 
