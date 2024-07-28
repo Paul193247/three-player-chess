@@ -55,7 +55,7 @@ def inizialize_board():
 
 @app.route("/")
 def index():
-    return "test"
+    return "test", 204
 
 @app.route('/board')
 def returnboard():
@@ -64,17 +64,14 @@ def returnboard():
 
 @app.route('/board', methods=['POST'])
 def change_board():
-    newboard = request.get_json()
+    changes = request.get_json()
 
     board, player = getboard()
 
-    newplayer = player + 1
+    board[changes["endpos"]] = board[changes["startpos"]]
+    board[changes["startpos"]] = ""
 
-    if newplayer > 3:
-        newplayer = 1
-
-    if newboard["player"] == newplayer:
-        setboard(newboard)
+    setboard(board)
 
     return '', 204
 
