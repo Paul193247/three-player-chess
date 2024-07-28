@@ -1,9 +1,9 @@
 # three-player-chess  
   
-##how to use the api  
+## how to use the api  
 base url: https://three-player-chess.vercel.app  
   
-###commands:  
+### commands:  
 /version: returns the version of the api  
   
 /initialize: resets the board  
@@ -13,14 +13,14 @@ base url: https://three-player-chess.vercel.app
 /board (POST): moves a Figure, expects list with following parameters:  
 player: int, Number of the player making the move,  
 startpos: str, Position of the Figur being moved e.g: A1,  
-endpos: str, position wherw the Figur moves to e.g: A1  
+endpos: str, position where the Figur moves to e.g: A1  
   
-###player numbers:  
+### player numbers:  
 1: white  
 2: brown  
 3: black  
   
-###abbreviations of the figures  
+### abbreviations of the figures  
 R: Rook  
 N: Knight  
 B: Bishop  
