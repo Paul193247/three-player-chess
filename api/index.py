@@ -62,10 +62,10 @@ def returnboard():
 
 @app.route('/board', methods=['POST'])
 def change_board():
-    changes = request.get_json()
-
-    board, player = getboard()
     try:
+      changes = request.get_json()
+
+      board, player = getboard()
       board[changes["endpos"]] = board[changes["startpos"]]
       board[changes["startpos"]] = ""
     except Exception as e:
