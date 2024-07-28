@@ -20,6 +20,33 @@ def setboard(board: dict, player: int):
     kv.set("board", json.dumps(board))
     kv.set("player", player)
 
+def check_move(changes, board, curr_player):
+    
+    startpos = changes["startpos"]
+    endpos = changes["endpos"]
+    
+    if(changes["player"]>3):
+        return "Invalid Player Number"
+    
+    next_player = int(curr_player) + 1
+
+    if next_player > 3:
+        next_player = 1
+    
+    if changes["player"] != next_player:
+        return "Wrong player"
+    
+    if startpos not in board.keys():
+        return "Invalid start position"
+    
+    if endpos not in board.keys():
+        return "Invalid end position"
+    
+    if board[startpos] == "" :
+        return "Start position is empty"
+
+    return True
+
 def getboard():
     kv = KV()
     board_str = kv.get("board")
@@ -69,12 +96,18 @@ def returnboard():
 def change_board():
     changes = request.get_json()
     board, player = getboard()
-      #board[changes["endpos"]] = board[changes["startpos"]]
-      #board[changes["startpos"]] = ""
 
-    #setboard(board)
+    check = check_move(changes, board, player)
 
-    return changes["startpos"]
+    if check != True:
+        return check
+
+    board[changes["endpos"]] = board[changes["startpos"]]
+    board[changes["startpos"]] = ""
+
+    setboard(board, changes["player"])
+
+    return "", 204
 
 if __name__ == '__main__':
     app.run(debug=False)
