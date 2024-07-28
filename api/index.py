@@ -5,7 +5,8 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return open("../index.html").read()
+    with open("index.html") as f:
+        return f.read()
 
 
 @app.errorhandler(404)
