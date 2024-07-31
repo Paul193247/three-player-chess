@@ -12,7 +12,7 @@ import random
 logging.basicConfig(level=logging.DEBUG)
 
 
-load_dotenv(dotenv_path='.env.development.local')
+load_dotenv(dotenv_path='../.env.development.local')
 
 app = Flask(__name__)
 
@@ -22,9 +22,22 @@ def setboard(board: dict, player: int, key):
     kv.set(f"{key}:player", player)
 
 def get_valid_moves(position, board):
+    def position_to_coords(pos):
+        col = pos[0]
+        row = int(pos[1:])
+        col_num = ord(col) - ord('A')
+        return col_num, row
 
-    def letter_to_position(letter):
-        return ord(letter.upper()) - ord('A') + 1
+    def coords_to_position(coords):
+        col_num, row = coords
+        col = chr(col_num + ord('A'))
+        return f"{col}{row}"
+
+    def move_piece(position, d):
+        x, y = position_to_coords(position)
+        new_x = x + d[0]
+        new_y = y + d[1]
+        return coords_to_position((new_x, new_y))
 
     if position not in board.keys():
         return f"Invalid Position, given position: {position} board: {board.keys()}"
@@ -34,156 +47,44 @@ def get_valid_moves(position, board):
     if figure == "":
         return f"No Figure at position {position}"
     
-    row, col = position[0], int(position[1:])
-    moves = []
+    valid_moves = []
 
     if figure.startswith("P"):  # Pawn logic
-        next_col = 0
-        if int(figure[1]) == 1:
-            if col == 4 and letter_to_position(row) > 4: 
-                next_col = 9
-                capture_positions = [
-                    (chr(ord(row) + 1) + 9),
-                    (chr(ord(row) - 1) + 9)
-                ]
-            else:
-                next_col = col + 1
-                capture_positions = [
-            (chr(ord(row) + 1) + str(col + 1)),
-            (chr(ord(row) - 1) + str(col + 1))
-        ]
-            
-        if int(figure[1]) == 2:
-            if col == 5 and letter_to_position(row) > 4: 
-                next_col = 9
-                if letter_to_position(row) == 5:
-                    capture_positions = [
-                        (chr(ord(row) + 1) + str(col + 1)),
-                        ("d9")
-                    ]
-                else:
-                    capture_positions = [
-                        (chr(ord(row) + 1) + str(col + 1)),
-                        (chr(ord(row) - 1) + str(col + 1))
-                    ]
-            elif col > 8 and letter_to_position(row) > 4:
-                next_col = col + 1
-                if letter_to_position(row) == 5:
-                    capture_positions = [
-                        (chr(ord(row) + 1) + "9"),
-                        ("d9")
-                    ]
-                else:
-                    capture_positions = [
-                        (chr(ord(row) + 1) + str(col - 1)),
-                        (chr(ord(row) - 1) + str(col - 1))
-                    ]
-            else:
-                next_col = col - 1
-                if letter_to_position(row) == 4:
-                    capture_positions = [
-                        ("i" + str(col - 1)),
-                        (chr(ord(row) - 1) + str(col - 1))
-                    ]
-                else:
-                    capture_positions = [
-                        (chr(ord(row) + 1) + str(col - 1)),
-                        (chr(ord(row) - 1) + str(col - 1))
-                    ]
+        direction = 1 if figure.endswith('1') else -1 if figure.endswith('2') else 1
+        pawn_moves = [(0, direction)]
+        for move in pawn_moves:
+            new_position = move_piece(position, move)
+            if new_position in board.keys() and board[new_position] == "":
+                valid_moves.append(new_position)
 
-        if int(figure[1]) == 3:
-            if col == 9 and letter_to_position(row) < 9:
-                next_col = 4
-                if row == "E":
-                    capture_positions = [
-                        ("I9"),
-                        (chr(ord(row) - 1) + "9")
-                    ]
-                else:
-                    capture_positions = [
-                        (chr(ord(row) + 1) + "9"),
-                        (chr(ord(row) - 1) + "9")
-                    ]
-            elif col == 9 and letter_to_position(row) > 8:
-                next_col = 5
-                if row == "I":
-                    capture_positions = [
-                        ("D9"),
-                        (chr(ord(row) + 1) + "9")
-                    ]
-                else:
-                    capture_positions = [
-                        (chr(ord(row) + 1) + "9"),
-                        (chr(ord(row) - 1) + "9")
-                    ]
-            elif col < 8 and letter_to_position(row) > 8:
-                next_col = col + 1
-                if row == "I":
-                    capture_positions = [
-                        ("D" + str(col + 1)),
-                        (chr(ord(row) + 1) + str(col + 1))
-                    ]
-                else:
-                    capture_positions = [
-                        (chr(ord(row) + 1) + str(col + 1)),
-                        (chr(ord(row) - 1) + str(col + 1))
-                    ]
-            else:
-                next_col = col - 1
-                if row == "E" == 4:
-                    capture_positions = [
-                        ("i" + str(col - 1)),
-                        (chr(ord(row) - 1) + str(col - 1))
-                    ]
-                else:
-                    capture_positions = [
-                        (chr(ord(row) + 1) + str(col - 1)),
-                        (chr(ord(row) - 1) + str(col - 1))
-                    ]
-                
-
-        forward_pos = row + str(next_col)
-        if forward_pos in board.keys() and board[forward_pos] == "":
-            moves.append(forward_pos)
-
-        for pos in capture_positions:
-            if pos in board and not board[pos].endswith(figure[1]) and not board[pos].endswith(""):
-                moves.append(pos)
+        capture_moves = [(1, direction), (-1, direction)]
+        for move in capture_moves:
+            new_position = move_piece(position, move)
+            if new_position in board.keys() and board[new_position] != "" and board[new_position][-1] != figure[-1]:
+                valid_moves.append(new_position)
 
     if figure.startswith("R"):  # Rook logic
-        directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
-        for d in directions:
-            for i in range(1, 8):
-                new_row = chr(ord(row) + i * d[0])
-                new_col = col + i * d[1]
-                endpos = new_row + str(new_col)
-                if endpos in board:
-                    if board[endpos] == "":
-                        moves.append(endpos)
-                    elif not board[endpos].endswith(figure[1]):
-                        moves.append(endpos)
-                        break
-                    else:
-                        break
-                else:
+        rook_moves = [(i, 0) for i in range(1, 9)] + [(-i, 0) for i in range(1, 9)] + \
+                     [(0, i) for i in range(1, 9)] + [(0, -i) for i in range(1, 9)]
+        for move in rook_moves:
+            new_position = move_piece(position, move)
+            if new_position in board.keys():
+                if board[new_position] == "":
+                    valid_moves.append(new_position)
+                elif board[new_position][-1] != figure[-1]:
+                    valid_moves.append(new_position)
                     break
 
     if figure.startswith("B"):  # Bishop logic
-        directions = [(1, 1), (1, -1), (-1, 1), (-1, -1)]
-        for d in directions:
-            for i in range(1, 8):
-                new_row = chr(ord(row) + i * d[0])
-                new_col = col + i * d[1]
-                endpos = new_row + str(new_col)
-                if endpos in board:
-                    if board[endpos] == "":
-                        moves.append(endpos)
-                    elif not board[endpos].endswith(figure[1]):
-                        moves.append(endpos)
-                        break
-                    else:
-                        break
-                else:
+        bishop_moves = [(i, i) for i in range(1, 9)] + [(-i, -i) for i in range(1, 9)] + \
+                       [(i, -i) for i in range(1, 9)] + [(-i, i) for i in range(1, 9)]
+        for move in bishop_moves:
+            new_position = move_piece(position, move)
+            if new_position in board.keys():
+                if board[new_position] == "":
+                    valid_moves.append(new_position)
+                elif board[new_position][-1] != figure[-1]:
+                    valid_moves.append(new_position)
                     break
 
     if figure.startswith("N"):  # Knight logic
@@ -192,32 +93,23 @@ def get_valid_moves(position, board):
             (1, 2), (1, -2), (-1, 2), (-1, -2)
         ]
         for move in knight_moves:
-            new_row = chr(ord(row) + move[0])
-            new_col = col + move[1]
-            endpos = new_row + str(new_col)
-            if endpos in board:
-                if board[endpos] == "" or not board[endpos].endswith(figure[1]):
-                    moves.append(endpos)
+            new_position = move_piece(position, move)
+            print(new_position)
+            if new_position in board.keys() and (board[new_position] == "" or board[new_position][-1] != figure[-1]):
+                valid_moves.append(new_position)
 
     if figure.startswith("Q"):  # Queen logic
-        directions = [
-            (1, 0), (-1, 0), (0, 1), (0, -1),
-            (1, 1), (1, -1), (-1, 1), (-1, -1)
-        ]
-        for d in directions:
-            for i in range(1, 8):
-                new_row = chr(ord(row) + i * d[0])
-                new_col = col + i * d[1]
-                endpos = new_row + str(new_col)
-                if endpos in board:
-                    if board[endpos] == "":
-                        moves.append(endpos)
-                    elif not board[endpos].endswith(figure[1]):
-                        moves.append(endpos)
-                        break
-                    else:
-                        break
-                else:
+        queen_moves = [(i, i) for i in range(1, 9)] + [(-i, -i) for i in range(1, 9)] + \
+                      [(i, -i) for i in range(1, 9)] + [(-i, i) for i in range(1, 9)] + \
+                      [(i, 0) for i in range(1, 9)] + [(-i, 0) for i in range(1, 9)] + \
+                      [(0, i) for i in range(1, 9)] + [(0, -i) for i in range(1, 9)]
+        for move in queen_moves:
+            new_position = move_piece(position, move)
+            if new_position in board.keys():
+                if board[new_position] == "":
+                    valid_moves.append(new_position)
+                elif board[new_position][-1] != figure[-1]:
+                    valid_moves.append(new_position)
                     break
 
     if figure.startswith("K"):  # King logic
@@ -226,17 +118,11 @@ def get_valid_moves(position, board):
             (1, 1), (1, -1), (-1, 1), (-1, -1)
         ]
         for move in king_moves:
-            new_row = chr(ord(row) + move[0])
-            new_col = col + move[1]
-            endpos = new_row + str(new_col)
-            if endpos in board:
-                if board[endpos] == "" or not board[endpos].endswith(figure[1]):
-                    moves.append(endpos)
+            new_position = move_piece(position, move)
+            if new_position in board.keys() and (board[new_position] == "" or board[new_position][-1] != figure[-1]):
+                valid_moves.append(new_position)
 
-    return moves
-
-
-
+    return valid_moves
 
 @app.route('/validmoves', methods=["POST"])
 def validmoves():
@@ -303,6 +189,8 @@ def check_move(changes, board, curr_player):
     
     if board[startpos] == "" :
         return "Start position is empty"
+    if endpos not in get_valid_moves(startpos, board):
+        return "Invalid move"
 
     return True
 
@@ -322,6 +210,23 @@ def getboard(key: str):
 def initialize_board(key):
 
     board = {'A1': 'R1', 'A2': 'P1', 'A3': '', 'A4': '', 'A5': '', 'A6': '', 'A7': 'P2', 'A8': 'R2', 'B1': 'N1', 'B2': 'P1', 'B3': '', 'B4': '', 'B5': '', 'B6': '', 'B7': 'P2', 'B8': 'N2', 'C1': 'B1', 'C2': 'P1', 'C3': '', 'C4': '', 'C5': '', 'C6': '', 'C7': 'P2', 'C8': 'B2', 'D1': 'Q1', 'D2': 'P1', 'D3': '', 'D4': '', 'D5': '', 'D6': '', 'D7': 'P2', 'D8': 'Q2', 'E1': 'K1', 'E2': 'P1', 'E3': '', 'E4': '', 'E5': '', 'E6': '', 'E9': '', 'E10': '', 'E11': 'P3', 'E12': 'K3', 'F1': 'B1', 'F2': 'P1', 'F3': '', 'F4': '', 'F9': '', 'F10': '', 'F11': 'P1', 'F12': 'B3', 'G1': 'N1', 'G2': 'P1', 'G3': '', 'G4': '', 'G9': '', 'G10': '', 'G11': 'P3', 'G12': 'N3', 'H1': 'R1', 'H2': 'P1', 'H3': '', 'H4': '', 'H9': '', 'H10': '', 'H11': 'P3', 'H12': 'R3', 'I5': '', 'I6': '', 'I7': 'P2', 'I8': 'K2', 'I9': '', 'I10': '', 'I11': 'P2', 'I12': 'Q3', 'J5': '', 'J6': '', 'J7': 'P2', 'J8': 'B2', 'J9': '', 'J10': '', 'J11': 'P3', 'J12': 'B3', 'K5': '', 'K6': '', 'K7': 'P2', 'K8': 'N2', 'K9': '', 'K10': '', 'K11': 'P3', 'K12': 'N3', 'L5': '', 'L6': '', 'L7': 'P2', 'L8': 'R2', 'L9': '', 'L10': '', 'L11': 'P3', 'L12': 'R3'}
+    board = {
+        'A1': 'R1', 'A2': 'P1', 'A3': '', 'A4': '', 'A5': '', 'A6': '', 'A7': 'P2', 'A8': 'R2', 
+        'B1': 'N1', 'B2': 'P1', 'B3': '', 'B4': '', 'B5': '', 'B6': '', 'B7': 'P2', 'B8': 'N2', 
+        'C1': 'B1', 'C2': 'P1', 'C3': '', 'C4': '', 'C5': '', 'C6': '', 'C7': 'P2', 'C8': 'B2', 
+        'D1': 'Q1', 'D2': 'P1', 'D3': '', 'D4': '', 'D5': '', 'D6': '', 'D7': 'P2', 'D8': 'Q2', 
+        'E1': 'K1', 'E2': 'P1', 'E3': '', 'E4': '', 'E5': '', 'E6': '', 'E9': '', 'E10': '', 
+        'E11': 'P3', 'E12': 'K3', 'F1': 'B1', 'F2': 'P1', 'F3': '', 'F4': '', 'F9': '', 
+        'F10': '', 'F11': 'P1', 'F12': 'B3', 'G1': 'N1', 'G2': 'P1', 'G3': '', 'G4': '', 
+        'G9': '', 'G10': '', 'G11': 'P3', 'G12': 'N3', 'H1': 'R1', 'H2': 'P1', 'H3': '', 
+        'H4': '', 'H9': '', 'H10': '', 'H11': 'P3', 'H12': 'R3', 'I5': '', 'I6': '', 
+        'I7': 'P2', 'I8': 'K2', 'I9': '', 'I10': '', 'I11': 'P2', 'I12': 'Q3', 'J5': '', 
+        'J6': '', 'J7': 'P2', 'J8': 'B2', 'J9': '', 'J10': '', 'J11': 'P3', 'J12': 'B3', 
+        'K5': '', 'K6': '', 'K7': 'P2', 'K8': 'N2', 'K9': '', 'K10': '', 'K11': 'P3', 
+        'K12': 'N3', 'L5': '', 'L6': '', 'L7': 'P2', 'L8': 'R2', 'L9': '', 'L10': '', 
+        'L11': 'P3', 'L12': 'R3'
+    }
+
     setboard(board, 3, key)
 
     kv = KV()
@@ -346,7 +251,7 @@ def index():
 
 @app.route("/version")
 def version():
-    version = "2.1.0"
+    version = "2.2.0"
     return jsonify(version)
 
 @app.route('/getboard', methods=["POST"])
@@ -370,12 +275,11 @@ def change_board():
     player_key = changes["playerkey"]
 
     if not player_keys[changes["player"]] == player_key:
-        return f"wrong player key for player {changes["player"]}"
+        player = changes["player"]
+        return f"wrong player key for player {player}"
 
-    check = check_move(changes, board, int(player))
-
-    if check != True:
-        return check
+    if check_move(changes, board, int(player)) != True:
+        return check_move(changes, board, int(player))
 
     board[changes["endpos"]] = board[changes["startpos"]]
     board[changes["startpos"]] = ""
