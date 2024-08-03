@@ -7,6 +7,7 @@ from flask import Flask, jsonify, request
 from vercel_kv import KV
 from dotenv import load_dotenv
 import logging
+from flask_cors import CORS
 import random
 
 logging.basicConfig(level=logging.DEBUG)
@@ -15,6 +16,8 @@ logging.basicConfig(level=logging.DEBUG)
 load_dotenv(dotenv_path='../.env.development.local')
 
 app = Flask(__name__)
+
+CORS(app)
 
 def setboard(board: dict, player: int, key):
     kv = KV()
@@ -144,7 +147,7 @@ def newplayer():
     players = json.loads(kv.get(f"{key}:activplayers"))
 
     if len(players.keys()) == 3:
-        return "There is no free player"
+        return jsonify("There is no free player")
 
     allplayers = "123"
 
@@ -293,7 +296,7 @@ def createGame():
     chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
     key = "".join(random.choice(chars) for _ in range(40))
     initialize_board(key)
-    return key
+    return jsonify(key)
 
 if __name__ == '__main__':
     app.run(debug=False)
