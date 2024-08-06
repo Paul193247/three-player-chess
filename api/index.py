@@ -12,9 +12,6 @@ import random
 
 logging.basicConfig(level=logging.DEBUG)
 
-
-load_dotenv(dotenv_path='../.env.development.local')
-
 app = Flask(__name__)
 
 CORS(app)
@@ -35,6 +32,38 @@ def get_valid_moves(position, board):
         col_num, row = coords
         col = chr(col_num + ord('A'))
         return f"{col}{row}"
+
+    thirds = []
+
+    third = {}
+    
+    for c in range(1, 5):
+        for r in range(0, 8):
+            key =coords_to_position((r, c))
+            third[key] = board[key]
+    thirds.append(third)
+
+    third = {}
+    
+    for c in range(9, 13):
+        for r in range(4, 11):
+            key =coords_to_position((r, c))
+            third[key] = board[key]
+    thirds.append(third)
+
+    third = {}
+    
+    for c in range(5, 9):
+        for r in range(0, 4):
+            key =coords_to_position((r, c))
+            third[key] = board[key]
+
+    for c in range(5, 9):
+        for r in range(8, 12):
+            key =coords_to_position((r, c))
+            third[key] = board[key]
+    thirds.append(third)
+        
 
     def move_piece(position, d):
         x, y = position_to_coords(position)
