@@ -47,4 +47,4 @@ P: Pawn
 
 ## To Do
 
-- optional web GUI fot the API where you can create and play games
+- optional web GUI fot the API in which you can create and play games
